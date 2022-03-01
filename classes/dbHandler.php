@@ -64,7 +64,7 @@ class DbHandler {
     /**
      * Delete record(s)
      */
-    public function deleteFromTable($table, $idcol, $value) {
+    public function deleteFromTable($table, $idcol, $value) { 
         $r = $this->conn->query("DELETE FROM $table WHERE $idcol = '$value'") or die($this->conn->error.__LINE__);
         return $result = $this->conn->affected_rows;    
     }

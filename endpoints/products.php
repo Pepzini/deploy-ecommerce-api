@@ -35,11 +35,9 @@ $app->get('/products/:id', function($id) use ($app) {
     // run query
     $product = $db->getOneRecord($query);
     // get orders if any
-    // $product_requests = $db->getRecordset("SELECT * FROM `request` LEFT JOIN product_location ON req_location_id=cl_id WHERE cl_product_id = '$id' ORDER BY req_time_initiated ");
     // return product
     if($product) {
         $response['product'] = $product;
-        // $response['product_requests'] = $product_requests;
     	$response['status'] = "success";
         $response["message"] =  " product found!";
         echoResponse(200, $response);
@@ -56,7 +54,7 @@ $app->post('/products', function() use ($app) {
     // extract post body
     $r = json_decode($app->request->getBody());
     // check required fields
-    verifyRequiredParams(['product_name', 'product_fragrance', 'product_origin'],$r->product);
+    verifyRequiredParams(['product_name', 'product_fragrance', 'product_origin', 'product_price', 'product_details'],$r->product);
     // instantiate classes
     $db = new DbHandler();
     $jh = new JWTHandler();
@@ -66,8 +64,8 @@ $app->post('/products', function() use ($app) {
     $product_fragrance = $db->purify($r->product->product_fragrance);
     $product_origin = $db->purify($r->product->product_origin);
     $product_category = $db->purify($r->product->product_category);
-    
-    $product_signup_verified = 1;
+    $product_price = $db->purify($r->product->product_price);
+    $product_details = $db->purify($r->product->product_details);
     // check if product name already exists
     $product_check  = $db->getOneRecord("SELECT product_id FROM `product` WHERE product_name='$product_name' ");
     if($product_check) {
@@ -81,10 +79,12 @@ $app->post('/products', function() use ($app) {
         $product_fragrance = $db->purify($r->product->product_fragrance);
         $product_origin = $db->purify($r->product->product_origin);
         $product_category = $db->purify($r->product->product_category);
+        $product_price = $db->purify($r->product->product_price);
+        $product_details = $db->purify($r->product->product_details);
         //create new product
         $product_id = $db->insertToTable(
-            [ $product_name, $product_fragrance, $product_origin, $product_category], /*values - array*/
-            [ 'product_name','product_fragrance','product_origin', 'product_category'], /*column names - array*/
+            [ $product_name, $product_fragrance, $product_origin, $product_category, $product_price, $product_details], /*values - array*/
+            [ 'product_name','product_fragrance','product_origin', 'product_category', 'product_price', 'product_details'], /*column names - array*/
             "product" /*table name - string*/
         );
         // product created successfully
@@ -110,7 +110,7 @@ $app->put('/products', function() use ($app) {
     // extract post body
     $r = json_decode($app->request->getBody());
     // check required fields
-    verifyRequiredParams(['product_id','product_name', 'product_fragrance', 'produt_origin'],$r->product);
+    verifyRequiredParams(['product_id','product_name', 'product_fragrance', 'product_origin', 'product_price', 'product_details'],$r->product);
     // instantiate classes
     $db = new DbHandler();
     
@@ -119,7 +119,8 @@ $app->put('/products', function() use ($app) {
     $product_name = $db->purify($r->product->product_name);
     $product_fragrance = $db->purify($r->product->product_fragrance);
     $product_origin = $db->purify($r->product->product_origin);
-  
+    $product_details = $db->purify($r->product->product_details);
+    $product_price = $db->purify($r->product->product_price);
      // check if product_name is already used
      $product_check  = $db->getOneRecord("SELECT product_id FROM `product` WHERE product_name = '$product_name' AND product_id <> '$product_id' ");
      if($product_check) {
@@ -129,12 +130,16 @@ $app->put('/products', function() use ($app) {
          echoResponse(201, $response);
      } else {
         //get fields for insert
-        $product_address = $db->purify($r->product->product_origin);
-        $product_phone = $db->purify($r->product->product_fragrance);
+        $product_id = $db->purify($r->product->product_id);
+        $product_name = $db->purify($r->product->product_name);
+    $product_fragrance = $db->purify($r->product->product_fragrance);
+    $product_origin = $db->purify($r->product->product_origin);
+    $product_details = $db->purify($r->product->product_details);
+    $product_price = $db->purify($r->product->product_price);
         //update product
         $update_product = $db->updateInTable(
         	"product", /*table*/
-            [ 'product_name'=>$product_name, 'product_fragrance' => $product_fragrance, 'product_origin' => $product_origin], /*columns*/
+            [ 'product_name'=>$product_name, 'product_fragrance' => $product_fragrance, 'product_origin' => $product_origin, 'product_price' => $product_price, 'product_details' => $product_details], /*columns*/
         	[ 'product_id'=>$product_id ] /*where clause*/
         );
         
@@ -172,4 +177,5 @@ $app->delete('/products/:id', function($id) use ($app) {
         echoResponse(201, $response);
     }
 });
+
 

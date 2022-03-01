@@ -47,7 +47,8 @@ CREATE TABLE `order` (
   `order_product` varchar(100) NOT NULL,
   `order_quantity` varchar(100) NOT NULL,
   `order_customer` varchar(20) NOT NULL,
-  PRIMARY KEY (`order_id`)
+  PRIMARY KEY (`order_id`),
+  UNIQUE KEY `order_id` (`order_id`),
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 

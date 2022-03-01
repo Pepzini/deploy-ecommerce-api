@@ -54,7 +54,7 @@ $app->post('/orders', function() use ($app) {
     $r = json_decode($app->request->getBody());
     // check required fields
     // var_dump($r->order);die;
-    verifyRequiredParams([ 'order_product', 'order_quantity','order_customer'],$r->order);
+    verifyRequiredParams(['order_product', 'order_quantity','order_customer'],$r->order);
     
     // instantiate classes
     $db = new DbHandler();
@@ -151,7 +151,7 @@ $app->delete('/orders/:id', function($id) use ($app) {
     // database handler
     $db = new DbHandler();
     // delete order
-    $order_delete = $db->deleteFromTable("order", "order_id", $id);
+    $order_delete = $db->deleteFromTable("`order`", "order_id", $id);
     // deleted?
     if($order_delete) {
     	// log admin action
