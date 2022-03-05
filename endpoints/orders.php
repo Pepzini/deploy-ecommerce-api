@@ -54,7 +54,7 @@ $app->post('/orders', function() use ($app) {
     $r = json_decode($app->request->getBody());
     // check required fields
     // var_dump($r->order);die;
-    verifyRequiredParams(['order_product', 'order_quantity','order_customer'],$r->order);
+    verifyRequiredParams(['order_remarks', 'order_quantity'],$r->order);
     
     // instantiate classes
     $db = new DbHandler();
@@ -62,23 +62,22 @@ $app->post('/orders', function() use ($app) {
 
     $order_date = date("Y-m-d");
     $order_remarks = $db->purify($r->order->order_remarks);
-    $order_product = $db->purify($r->order->order_product);
     $order_quantity = $db->purify($r->order->order_quantity);
-    $order_customer = $db->purify($r->order->order_customer);
-    $order_remarks = $db->purify($r->order->order_remarks);
+    // $order_product = $db->purify($r->order->order_product);
+    // $order_customer = $db->purify($r->order->order_customer);
     $order_signup_verified = 1;
 
         //get fields for insert
         $order_date = date("Y-m-d");
-        $order_product = $db->purify($r->order->order_product);
+    //    $order_customer = $db->purify($r->order->order_customer);
+    //     $order_product = $db->purify($r->order->order_product);
         $order_quantity = $db->purify($r->order->order_quantity);
-        $order_customer = $db->purify($r->order->order_customer);
         $order_remarks = $db->purify($r->order->order_remarks);
         $order_signup_verified = 1;
         //create new order
         $order_id = $db->insertToTable(
-            [$order_date, $order_product, $order_quantity, $order_customer, $order_remarks], /*values - array*/
-            ['order_date','order_product', 'order_quantity', 'order_customer', 'order_remarks'], /*column names - array*/
+            [$order_date, $order_quantity, $order_remarks], /*values - array*/
+            ['order_date','order_quantity', 'order_remarks'], /*column names - array*/
             "order" /*table name - string*/
         );
         // order created successfully
@@ -104,29 +103,35 @@ $app->put('/orders', function() use ($app) {
     // extract post body
     $r = json_decode($app->request->getBody());
     // check required fields
-    verifyRequiredParams(['order_id', 'order_product', 'order_quantity', 'order_customer'], $r->order);
+    verifyRequiredParams(['order_id','order_customer', 'order_product', 'order_quantity', 'order_remarks'],$r->order);
     // instantiate classes
     $db = new DbHandler();
     
     // order id
-    $order_id = $db->purify($r->order->order_id);
-    $order_product = $db->purify($r->order->order_product);
-    $order_price_total = $db->purify($r->order->order_price_total);
-    $order_quantity = $db->purify($r->order->order_quantity);
-    $order_customer = $db->purify($r->order->order_customer);
+    $order_id  = $db->purify($r->order->order_id);
+    $order_date = date("Y-m-d");
     $order_remarks = $db->purify($r->order->order_remarks);
-    $order_status = $db->purify($r->order->order_status);
+    $order_customer = $db->purify($r->order->order_customer);
+    $order_quantity = $db->purify($r->order->order_quantity);
+    $order_product = $db->purify($r->order->order_product);
+     // check if order_name is already used
+     $order_check  = $db->getOneRecord("SELECT order_id FROM `order` WHERE order_date = '$order_date' AND order_id <> '$order_id' ");
+     if($order_check) {
+         // order already exists
+         $response['status'] = "error";
+         $response["message"] = "order with same name already Exists!";
+         echoResponse(201, $response);
+     } else {
         //get fields for insert
-        $order_product = $db->purify($r->order->order_product);
-        $order_price_total = $db->purify($r->order->order_price_total);
-        $order_quantity = $db->purify($r->order->order_quantity);
+        $order_id = $db->purify($r->order->order_id);
         $order_customer = $db->purify($r->order->order_customer);
-        $order_status = $db->purify($r->order->order_status);
-        
+    $order_product = $db->purify($r->order->order_product);
+    $order_remarks = $db->purify($r->order->order_remarks);
+    $order_quantity = $db->purify($r->order->order_quantity);
         //update order
         $update_order = $db->updateInTable(
         	"order", /*table*/
-            [  'order_product' => $order_product, 'order_price_total' => $order_price_total, 'order_quantity' => $order_quantity, 'order_customer' => $order_customer, 'order_status' => $order_status], /*columns*/
+            [ 'order_customer'=>$order_customer, 'order_product' => $order_product, 'order_quantity' => $order_quantity, 'order_remarks' => $order_remarks], /*columns*/
         	[ 'order_id'=>$order_id ] /*where clause*/
         );
         
@@ -141,7 +146,7 @@ $app->put('/orders', function() use ($app) {
             $response["message"] = "Something went wrong while trying to update the order!";
             echoResponse(201, $response);
         }
-    
+    }
 });
 $app->delete('/orders/:id', function($id) use ($app) {
     // // only super admins allowed
