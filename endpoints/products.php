@@ -15,7 +15,7 @@ $app->get('/products', function() use ($app) {
     if($products) {
     	$response['products'] = $products;
     	$response['status'] = "success";
-        $response["message"] =  count($products) . "Product(s) found!";
+        $response["message"] =  count($products) . " Product(s) found!";
         echoResponse(200, $response);
     } else {
     	$response['status'] = "error";

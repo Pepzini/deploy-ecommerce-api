@@ -10,6 +10,7 @@ $app->post('/auth/user/register', function () use ($app) {
     $response = [];
     // db handler class
     $db = new DbHandler();
+    $user = $r->user;
     // extract fields
     $user_name = $db->purify($r->user->user_name);
     $user_email = $db->purify($r->user->user_email);
@@ -22,50 +23,33 @@ $app->post('/auth/user/register', function () use ($app) {
         // hash password ---
         // $user_password = hash($user_password); //somehow
         // generate signup token
-        $pg = new PasswordGenerator();
-        $user_token = $pg->randomNumericPassword(6, false);
+        // $pg = new PasswordGenerator();
+       // $user_token = $pg->randomNumericPassword(6, false); -->
         // create user
         $user_id = $db->insertToTable(
-            [$user_name, $user_email, $user_phone, $user_password, $user_token, date('Y-m-d H:i:s'), date('Y-m-d H:i:s')], //values
-            ['user_name', 'user_email', 'user_phone', 'user_password', 'user_token', 'user_time_reg', 'user_token_time'], //columns names
+            [$user_name, $user_email, $user_phone, $user_password, date('Y-m-d H:i:s')], //values
+            ['user_name', 'user_email', 'user_phone', 'user_password', 'user_time_reg'], //columns names
             'user'
-        );
+        ); 
+        // var_dump($user_id); die;
         // user successfully created?
+        // useromer successfully created?
         if ($user_id) {
-            // user created successfully
-            // send token by sms
-            /*$ebulk = new ebulksms();
-            $sms_msg = $user_token . ' is your Signup Token for ' . SHORTNAME;
-            $ebulk->sendSMS($sms_msg, [$user_phone]);
-            // send token and password by email
-            $sm = new mySwiftMailer();
-            $SHORTNAME = SHORTNAME;
-            $subject = "New Account and Verification Token on {$SHORTNAME}";
-            $body = "<p>Hello {$user_name},</p>
-            <p>You just created an account on {$SHORTNAME}. You can always log into your account using the following details:</p>
-            <p>Email: <strong>{$user_email}</strong><br>
-            Password: <strong>{$user_password}</strong></p>
-            <p>Meanwhile, to complete your registration, you need to enter the following Token where you registered:</p>
-            Token: <strong>{$user_token}</strong></p>
-            <p>Thank you for using {$SHORTNAME}.</p>
-            <p>NOTE: please DO NOT REPLY to this email.</p>
-            <p><br><strong>{$SHORTNAME} App</strong></p>";
-            $sm->sendmail(FROM_EMAIL, SHORTNAME, [$user_email], $subject, $body); */
             // return success
             $response['status'] = "success";
             $response['message'] = 'Logged in successfully. Taking you in...';
-            $response['user_id'] = $user_id;
+            $response['user'] = $user;
             echoResponse(200, $response);
         } else {
-            // mysql error - user creation failed
+            // mysql error - useromer creation failed
             $response['status'] = "error";
             $response['message'] = 'Signup failed! Something went wrong while to create your account';
             echoResponse(201, $response);
         }
     } else {
-        // user email/phone already exists
+        // useromer email/phone already exists
         $response['status'] = "error";
-        $response['message'] = "Sorry, another user already registered with this email or phone!";
+        $response['message'] = "Sorry, another useromer already registered with this email or phone!";
         echoResponse(201, $response);
     }
 });
@@ -110,7 +94,6 @@ $app->post('/auth/user/login', function () use ($app) {
         echoResponse(201, $response);
     }
 });
-
 //allow users to log out
 $app->delete('/auth/user/logout', function () {
     $response['status'] = "success";

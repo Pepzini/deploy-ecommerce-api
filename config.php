@@ -24,5 +24,8 @@ define('FROM_EMAIL', 'niniola@tulabyte.net');
 /*Admin Email*/
 define('ADMIN_EMAIL', 'niniola@tulabyte.net');
 
+/*JWT Secret*/
+define('JWT_KEY', 'fdb!AiNGITT*yt1920@tb.com');
+
 
 

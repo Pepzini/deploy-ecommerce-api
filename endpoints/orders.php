@@ -63,14 +63,14 @@ $app->post('/orders', function() use ($app) {
     $order_date = date("Y-m-d");
     $order_remarks = $db->purify($r->order->order_remarks);
     $order_quantity = $db->purify($r->order->order_quantity);
-    // $order_product = $db->purify($r->order->order_product);
-    // $order_customer = $db->purify($r->order->order_customer);
+     $order_product = $db->purify($r->order->order_product);
+     $order_customer = $db->purify($r->order->order_customer);
     $order_signup_verified = 1;
 
         //get fields for insert
         $order_date = date("Y-m-d");
-    //    $order_customer = $db->purify($r->order->order_customer);
-    //     $order_product = $db->purify($r->order->order_product);
+        $order_customer = $db->purify($r->order->order_customer);
+        $order_product = $db->purify($r->order->order_product);
         $order_quantity = $db->purify($r->order->order_quantity);
         $order_remarks = $db->purify($r->order->order_remarks);
         $order_signup_verified = 1;
