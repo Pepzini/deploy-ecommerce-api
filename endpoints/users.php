@@ -35,13 +35,13 @@ $app->get('/users/:id', function($id) use ($app) {
     // run query
     $user = $db->getOneRecord($query);
     // get orders if any
-    //$user_requests = $db->getRecordset("SELECT * FROM `request` LEFT JOIN user_location ON req_location_id=cl_id WHERE cl_user_id = '$id' ORDER BY req_time_initiated ");
+    $user_id = $db->getRecordset("SELECT * FROM `user` LEFT JOIN user_name ON user_id=user_id WHERE user_name = '$id' ORDER BY user_name ");
     // return user
     if($user) {
         $response['user'] = $user;
-        //$response['user_requests'] = $user_requests;
+        $response['user_name'] = $user_name;
     	$response['status'] = "success";
-        $response["message"] =  " user found!";
+        $response["message"] = "$user_name found!";
         echoResponse(200, $response);
     } else {
     	$response['status'] = "error";
@@ -127,7 +127,7 @@ $app->post('/users', function() use ($app) {
     }
 });
 // edit user
-$app->put('/users', function() use ($app) {
+$app->put('/users/', function() use ($app) {
     // only super admins allowed
     // authAdmin('super');
     // initialize response array
@@ -155,6 +155,9 @@ $app->put('/users', function() use ($app) {
          echoResponse(201, $response);
      } else {
         //get fields for insert
+        $user_id = $db->purify($r->user->user_id);
+        $user_name = $db->purify($r->user->user_name);
+        $user_email = $db->purify($r->user->user_email);
         $user_address = $db->purify($r->user->user_address);
         $user_phone = $db->purify($r->user->user_phone);
         //update user
@@ -165,7 +168,7 @@ $app->put('/users', function() use ($app) {
         );
         
         // user updated successfully
-        if($update_user >= 0) {
+        if($update_user > 0) {
             // log admin action
             $response['status'] = "success";
             $response["message"] = "user updated successfully!";

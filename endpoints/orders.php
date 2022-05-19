@@ -76,8 +76,8 @@ $app->post('/orders', function() use ($app) {
         $order_signup_verified = 1;
         //create new order
         $order_id = $db->insertToTable(
-            [$order_date, $order_quantity, $order_remarks], /*values - array*/
-            ['order_date','order_quantity', 'order_remarks'], /*column names - array*/
+            [$order_date, $order_quantity, $order_remarks, $order_customer, $order_product], /*values - array*/
+            ['order_date','order_quantity', 'order_remarks', 'order_customer', 'order_product'], /*column names - array*/
             "order" /*table name - string*/
         );
         // order created successfully
